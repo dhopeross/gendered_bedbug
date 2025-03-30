@@ -41,6 +41,5 @@ foreach ($BSPfile in $BSPFiles) {
 /log="$(Join-Path $TransferStagingPath "FITHNET.log")" `
 /command `
 "open $FastDLServer" `
-"cd $RemoteMapTarget" `
-"put $(Join-Path $TransferStagingPath "*.bz2")" `
+"synchronize remote -criteria=checksum -filemask=`"*.bz2`" $TransferStagingPath $RemoteMapTarget" `
 "exit"
