@@ -5,6 +5,7 @@
 
 ### Configuration
 $FastDLServer = "sftp://USERNAME:PASSWORD@hosted.nfoservers.com/"
+$FastDLServerHostKey = "HirHG9VT3uH/YaMNZIZq1iH+u1AqeJdV6t0qIV3JO7E"
 $RemoteMapTarget = "/usr/www/fithnet/public/FastDL/maps/"
 $MapPath = "C:\Games\tf2maps"
 $TransferStagingPath = Join-Path $ENV:Temp "tf2maps"
@@ -43,8 +44,8 @@ foreach ($BSPfile in $BSPFiles) {
 # change to target directory
 # copy BZ2 archives
 & $WinSCPPath `
-/log="$(Join-Path $TransferStagingPath "FITHNET.log")" `
+/log="$(Join-Path $TransferStagingPath "zzz_FITHNET.log")" `
 /command `
-"open $FastDLServer" `
-"synchronize remote -preview -criteria=checksum -filemask=`"*.bz2`" $TransferStagingPath $RemoteMapTarget" `
+"open $FastDLServer -hostkey=`"$FastDLServerHostKey`"" `
+"synchronize remote -criteria=checksum -filemask=`"*.bz2`" $TransferStagingPath $RemoteMapTarget" `
 "exit"
