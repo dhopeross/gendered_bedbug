@@ -1,26 +1,27 @@
+###
 ### Sync map directory to fastdl server
 ###
-### This script assumes that 
+
 
 ### Configuration
-$FastDLServer = "sftp://fithnet:CHANGETHISPASSWORD@hosted.nfoservers.com/"
+$FastDLServer = "sftp://USERNAME:PASSWORD@hosted.nfoservers.com/"
 $RemoteMapTarget = "/usr/www/fithnet/public/FastDL/maps/"
 $MapPath = "C:\Games\tf2maps"
 $TransferStagingPath = Join-Path $ENV:Temp "tf2maps"
 
 # Check WinSCP path
 if([Environment]::Is64BitOperatingSystem) {
-    $WinSCPPath = Join-Path ${env:programfiles(x86)} "WinSCP" "WinSCP.com"
+    $WinSCPPath = Join-Path ${env:programfiles(x86)} (Join-Path "WinSCP" "WinSCP.com")
 }
 else {
-    $WinSCPPath = Join-Path $env:programfiles "WinSCP" "WinSCP.com"
+    $WinSCPPath = Join-Path $env:programfiles (Join-Path "WinSCP" "WinSCP.com")
 }
 if(-not (Test-Path $WinSCPPath)){
     Write-Error "$WinSCPPath is needed!" -RecommendedAction "Install WinSCP" -ErrorAction:Stop
 }
 
 # Check 7zip path
-$7zPath = Join-Path $env:programfiles "7-zip" "7z.exe"
+$7zPath = Join-Path $env:programfiles (Join-Path "7-zip" "7z.exe")
 if (-not (Test-Path $7zPath)){
     Write-Error "$7zPath needed!" -RecommendedAction "Install 7zip" -ErrorAction:Stop
 }
@@ -31,7 +32,11 @@ New-Item -ItemType Directory -Force -Path $TransferStagingPath
 #Create BZ2 archives for each BSP file in folder
 $BSPFiles = @(Get-ChildItem (Join-Path $MapPath "*.bsp"))
 foreach ($BSPfile in $BSPFiles) {
-    & $7zPath "a" "-tbzip2" (Join-Path $TransferStagingPath "$($BSPFile.name).bz2") (Join-Path $MapPath $BSPFile.name)
+	$SourcePath = Join-Path $MapPath $BSPFile.name
+	$DestPath = Join-Path $TransferStagingPath "$($BSPFile.name).bz2"
+	if (-not (Test-Path -Path $DestPath -PathType Leaf)) {
+		(& $7zPath "a" "-mmt1" "-tbzip2" $DestPath $SourcePath)
+	}
 }
 
 # Open SFTP Session to Webserver
@@ -41,5 +46,5 @@ foreach ($BSPfile in $BSPFiles) {
 /log="$(Join-Path $TransferStagingPath "FITHNET.log")" `
 /command `
 "open $FastDLServer" `
-"synchronize remote -criteria=checksum -filemask=`"*.bz2`" $TransferStagingPath $RemoteMapTarget" `
+"synchronize remote -preview -criteria=checksum -filemask=`"*.bz2`" $TransferStagingPath $RemoteMapTarget" `
 "exit"
