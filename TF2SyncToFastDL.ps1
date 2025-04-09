@@ -5,7 +5,7 @@
 
 ### Configuration
 $FastDLServer = "sftp://USERNAME:PASSWORD@hosted.nfoservers.com/"
-$FastDLServerHostKey = "HirHG9VT3uH/YaMNZIZq1iH+u1AqeJdV6t0qIV3JO7E"
+$FastDLServerHostKey = "Put key fingerprint for server here"
 $RemoteMapTarget = "/usr/www/fithnet/public/FastDL/maps/"
 $MapPath = "C:\Games\tf2maps"
 $TransferStagingPath = Join-Path $ENV:Temp "tf2maps"
